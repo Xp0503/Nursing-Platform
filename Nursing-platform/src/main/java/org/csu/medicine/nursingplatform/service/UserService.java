@@ -6,6 +6,7 @@ import org.csu.medicine.nursingplatform.mapper.SmsCodeMapper;
 import org.csu.medicine.nursingplatform.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -15,6 +16,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 @Component
+@Service
 public class UserService {
     @Autowired
     private UserMapper userMapper;
