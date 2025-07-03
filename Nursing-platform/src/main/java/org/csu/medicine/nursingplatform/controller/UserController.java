@@ -178,4 +178,16 @@ public class UserController {
             return ResponseEntity.internalServerError().body("服务器错误: " + e.getMessage());
         }
     }
+    // 更新用户信息
+    @PutMapping("/user/update")
+    public ResponseEntity<?> updateUser(@RequestBody User user) {
+        try {
+            userService.updateUser(user);
+            return ResponseEntity.ok("个人信息更新成功");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("服务器错误: " + e.getMessage());
+        }
+    }
 }

@@ -117,6 +117,7 @@ public class UserService {
      */
     public User login(String phone, String password) {
         User user = userMapper.selectByPhone(phone);
+        System.out.println("密码登录被调用");
         if (user == null) {
             throw new IllegalArgumentException("用户不存在");
         }
@@ -393,4 +394,35 @@ public class UserService {
         System.out.println("用户密码已更新: " + phone);
     }
 
+    //更新用户信息
+    @Transactional
+    public void updateUser(User user) {
+        // 验证必填字段
+        if (user.getPhone() == null || user.getPhone().isEmpty()) {
+            throw new IllegalArgumentException("手机号不能为空");
+        }
+
+        // 验证性别格式
+        validateGender(user.getGender());
+
+        // 验证出生日期
+        validateBirth(user.getBirth());
+
+        // 验证身份证号格式
+        if (user.getIdnumber() != null && !user.getIdnumber().isEmpty()) {
+            String idError = IdNumbervalidate(user.getIdnumber());
+            if (idError != null) {
+                throw new IllegalArgumentException(idError);
+            }
+        }
+
+        // 设置更新时间
+        user.setUpdateTime(LocalDateTime.now());
+
+        // 更新用户信息
+        int result = userMapper.updateById(user);
+        if (result <= 0) {
+            throw new RuntimeException("用户信息更新失败");
+        }
+    }
 }
