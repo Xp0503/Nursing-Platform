@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/complaints")
+@CrossOrigin
 public class ComplaintController {
 
     @Autowired
@@ -19,6 +20,7 @@ public class ComplaintController {
     @PostMapping
     public ResponseEntity<Complaint> createComplaint(
             @RequestBody Complaint complaint) {
+        System.out.println(complaint);
         return ResponseEntity.ok(complaintService.createComplaint(complaint));
     }
 

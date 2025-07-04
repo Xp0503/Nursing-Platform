@@ -13,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
+@CrossOrigin
 public class OrderController {
 
     @Autowired
@@ -23,6 +24,7 @@ public class OrderController {
      */
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Order>> getUserOrders(@PathVariable Long userId) {
+        System.out.println(userId);
         return ResponseEntity.ok(orderService.getUserOrders(userId));
     }
 

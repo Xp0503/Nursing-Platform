@@ -4,11 +4,13 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.Date;
 
 @Data
 @TableName("order_evaluation")
+@CrossOrigin
 public class OrderEvaluation {
     @TableId(type = IdType.AUTO)
     private Long id;
