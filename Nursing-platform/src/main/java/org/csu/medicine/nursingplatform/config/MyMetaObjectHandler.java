@@ -13,10 +13,12 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
     public void insertFill(MetaObject metaObject) {
         // 为 create_time 字段填充当前时间
         this.strictInsertFill(metaObject, "createTime", LocalDateTime.class, LocalDateTime.now());
+        this.strictInsertFill(metaObject, "createdTime", LocalDateTime::now, LocalDateTime.class);
+        this.strictInsertFill(metaObject, "updatedTime", LocalDateTime::now, LocalDateTime.class);
     }
 
     @Override
     public void updateFill(MetaObject metaObject) {
-        // 不需要更新 create_time
+        this.strictUpdateFill(metaObject, "updatedTime", LocalDateTime::now, LocalDateTime.class);// 不需要更新 create_time
     }
 }

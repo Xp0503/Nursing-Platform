@@ -45,7 +45,7 @@ public class ServiceService {
         }
 
         HealthcareService service = serviceMapper.selectById(id);
-        if (service == null || service.getStatus() == 0) {
+        if (service == null) {
             throw new RuntimeException("服务不存在或已下架");
         }
         return service;

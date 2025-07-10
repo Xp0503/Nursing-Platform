@@ -19,21 +19,18 @@ public class ServiceScheduleController {
     @Autowired
     private ServiceScheduleService scheduleService;
 
-
-
-    // 获取服务的预约时间列表
     @GetMapping("/service/{serviceId}")
     public ResponseEntity<List<ServiceSchedule>> getSchedulesByServiceId(
             @PathVariable Long serviceId) {
         return ResponseEntity.ok(scheduleService.getSchedulesByServiceId(serviceId));
     }
 
-    // 获取服务未来7天的预约时间
     @GetMapping("/service/{serviceId}/next7days")
     public ResponseEntity<List<ServiceSchedule>> getSchedulesForNext7Days(
             @PathVariable Long serviceId) {
         return ResponseEntity.ok(scheduleService.getSchedulesForNext7Days(serviceId));
     }
+
     @PostMapping("/{id}/occupy")
     public ResponseEntity<Map<String, Object>> occupySchedule(@PathVariable Long id) {
         Map<String, Object> result = new HashMap<>();
@@ -49,7 +46,6 @@ public class ServiceScheduleController {
         }
     }
 
-
     @PostMapping("/{id}/release")
     public ResponseEntity<Map<String, Object>> releaseSchedule(@PathVariable Long id) {
         Map<String, Object> result = new HashMap<>();
@@ -64,6 +60,24 @@ public class ServiceScheduleController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
         }
     }
-
-
+    // 添加以下方法
+    @PostMapping
+    public ResponseEntity<Map<String, Object>> createSchedule(
+            @RequestBody ServiceSchedule schedule) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            scheduleService.createSchedule(schedule);
+            result.put("success", true);
+            result.put("message", "预约时间创建成功");
+            return ResponseEntity.ok(result);
+        } catch (RuntimeException e) {
+            result.put("success", false);
+            result.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", "服务器错误: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
+        }
+    }
 }

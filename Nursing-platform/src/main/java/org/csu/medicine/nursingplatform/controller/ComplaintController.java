@@ -50,8 +50,21 @@ public class ComplaintController {
     public ResponseEntity<Void> processComplaint(
             @PathVariable Long complaintId,
             @RequestParam Integer status,
-            @RequestParam String feedback) {
-        complaintService.processComplaint(complaintId, status, feedback);
+            @RequestParam String feedback,
+            @RequestParam(required = false) Long handlerDoctorId) {  // 新增处理医生ID参数
+        complaintService.processComplaint(complaintId, status, feedback, handlerDoctorId);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/doctor/{doctorId}")
+    public ResponseEntity<List<Complaint>> getDoctorComplaints(
+            @PathVariable Long doctorId) {
+        return ResponseEntity.ok(complaintService.getComplaintsByDoctor(doctorId));
+    }
+
+    @GetMapping("/handler/{doctorId}")
+    public ResponseEntity<List<Complaint>> getHandlerComplaints(
+            @PathVariable Long doctorId) {
+        return ResponseEntity.ok(complaintService.getComplaintsByHandler(doctorId));
     }
 }

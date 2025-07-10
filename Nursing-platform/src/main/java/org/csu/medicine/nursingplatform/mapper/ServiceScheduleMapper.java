@@ -14,78 +14,44 @@ import java.util.List;
 
 @Mapper
 public interface ServiceScheduleMapper extends BaseMapper<ServiceSchedule> {
-    @Select("SELECT COUNT(*) FROM service_schedule " +
+    @Select("SELECT COUNT(*) FROM doctor_schedule " + // 修改表名
             "WHERE service_id = #{serviceId} " +
             "AND status = 1 " +
-            "AND (schedule_date > #{today} OR " +
-            "     (schedule_date = #{today} AND " +
-            "      (schedule_hour > #{now.hour} OR " +
-            "       (schedule_hour = #{now.hour} AND schedule_minute >= #{now.minute}))))")
-    int countAvailableSchedules(
-            @Param("serviceId") Long serviceId,
-            @Param("today") LocalDate today,
-            @Param("now") LocalTime now);
+            "AND start_time > NOW()") // 使用 start_time 和 NOW() 比较
+    int countAvailableSchedules(@Param("serviceId") Long serviceId);
 
-    @Select("SELECT * FROM service_schedule " +
+    @Select("SELECT * FROM doctor_schedule " + // 修改表名
             "WHERE service_id = #{serviceId} " +
             "AND status = 1 " +
-            "AND (schedule_date > #{today} OR " +
-            "     (schedule_date = #{today} AND " +
-            "      (schedule_hour > #{now.hour} OR " +
-            "       (schedule_hour = #{now.hour} AND schedule_minute >= #{now.minute})))) " +
-            "ORDER BY schedule_date ASC, schedule_hour ASC, schedule_minute ASC")
+            "AND start_time > NOW() " + // 使用 start_time
+            "ORDER BY start_time ASC")
     List<ServiceSchedule> findUpcomingSchedulesByServiceId(
-            @Param("serviceId") Long serviceId,
-            @Param("today") LocalDate today,
-            @Param("now") LocalTime now);
+            @Param("serviceId") Long serviceId);
 
-    @Select("SELECT * FROM service_schedule " +
+    @Select("SELECT * FROM doctor_schedule " + // 修改表名
             "WHERE service_id = #{serviceId} " +
-            "AND schedule_date BETWEEN #{start} AND #{end} " +
-            "ORDER BY schedule_date ASC, schedule_hour ASC, schedule_minute ASC")
+            "AND start_time BETWEEN #{start} AND #{end} " + // 使用 start_time
+            "ORDER BY start_time ASC")
     List<ServiceSchedule> findSchedulesByServiceIdAndDateRange(
             @Param("serviceId") Long serviceId,
-            @Param("start") LocalDate start,
-            @Param("end") LocalDate end);
+            @Param("start") LocalDateTime start,  // 改为 LocalDateTime
+            @Param("end") LocalDateTime end);    // 改为 LocalDateTime
 
-    //看看对应service是否有status=1的
-    @Select("SELECT COUNT(*) FROM service_schedule " +
+    // 简化 countAvailableSchedulesRaw
+    @Select("SELECT COUNT(*) FROM doctor_schedule " + // 修改表名
             "WHERE service_id = #{serviceId} " +
             "AND status = 1 " +
-            "AND (schedule_date > #{today} OR " +
-            "     (schedule_date = #{today} AND " +
-            "      (schedule_hour > #{nowHour} OR " +
-            "       (schedule_hour = #{nowHour} AND schedule_minute >= #{nowMinute}))))")
-    int countAvailableSchedulesRaw(
-            @Param("serviceId") Long serviceId,
-            @Param("today") LocalDate today,
-            @Param("nowHour") int nowHour,
-            @Param("nowMinute") int nowMinute
-    );
+            "AND start_time > NOW()")
+    int countAvailableSchedulesRaw(@Param("serviceId") Long serviceId);
 
-    @Update("UPDATE service_schedule " +
+    @Update("UPDATE doctor_schedule " + // 修改表名
             "SET status = 0 " +
             "WHERE status = 1 " +
-            "AND (schedule_date < #{today} " +
-            "   OR (schedule_date = #{today} AND " +
-            "       (schedule_hour < #{hour} " +
-            "        OR (schedule_hour = #{hour} AND schedule_minute < #{minute}))))")
-    int markExpiredSchedulesUnavailable(
-            @Param("today") LocalDate today,
-            @Param("hour") int hour,
-            @Param("minute") int minute
-    );
-    //找出有哪些服务的预约已经过期，再更新它们的状态，并根据其 serviceId 更新对应的 healthcare_service 状态。
-    @Select("SELECT * FROM service_schedule " +
-            "WHERE status = 1 " +
-            "AND (schedule_date < #{today} " +
-            "  OR (schedule_date = #{today} AND " +
-            "      (schedule_hour < #{hour} " +
-            "       OR (schedule_hour = #{hour} AND schedule_minute < #{minute}))))")
-    List<ServiceSchedule> findExpiredSchedules(
-            @Param("today") LocalDate today,
-            @Param("hour") int hour,
-            @Param("minute") int minute
-    );
+            "AND start_time < NOW()") // 使用 start_time
+    int markExpiredSchedulesUnavailable();
 
+    @Select("SELECT * FROM doctor_schedule " + // 修改表名
+            "WHERE status = 1 " +
+            "AND start_time < NOW()") // 使用 start_time
+    List<ServiceSchedule> findExpiredSchedules();
 }

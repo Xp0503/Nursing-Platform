@@ -1,6 +1,5 @@
 package org.csu.medicine.nursingplatform.controller;
 
-
 import org.csu.medicine.nursingplatform.entity.Order;
 import org.csu.medicine.nursingplatform.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,6 @@ public class OrderController {
      */
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Order>> getUserOrders(@PathVariable Long userId) {
-        System.out.println(userId);
         return ResponseEntity.ok(orderService.getUserOrders(userId));
     }
 
@@ -38,10 +36,14 @@ public class OrderController {
             @RequestParam Long addressId,
             @RequestParam String appointmentTime, // ISO格式: "2025-07-01T10:00:00"
             @RequestParam BigDecimal amount,
-            @RequestParam(required = false) String remark) {
+            @RequestParam(required = false) String remark,
+            @RequestParam(required = false) Long scheduleId) { // 新增排班ID参数
 
         LocalDateTime appointment = LocalDateTime.parse(appointmentTime);
-        Order order = orderService.createOrder(userId, serviceId, addressId, appointment, amount, remark);
+        Order order = orderService.createOrder(
+                userId, serviceId, addressId,
+                appointment, amount, remark, scheduleId
+        );
         return ResponseEntity.ok(order);
     }
 

@@ -3,27 +3,17 @@ package org.csu.medicine.nursingplatform.entity;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 @Data
-@TableName("service_schedule")
+@TableName("doctor_schedule") // 修改表名
 public class ServiceSchedule {
     @TableId(type = IdType.AUTO)
     private Long id;
 
+    private Long doctorId; // 新增医生ID字段
     private Long serviceId;
-
-    @TableField("schedule_date")
-    private LocalDate scheduleDate; // 服务日期
-
-    @TableField("schedule_hour")
-    private Integer scheduleHour; // 开始小时 (0-23)
-
-    @TableField("schedule_minute")
-    private Integer scheduleMinute; // 开始分钟 (0-59)
-
+    private LocalDateTime startTime; // 合并日期和时间字段
     private Integer duration;
     private Integer status; // 0-不可用 1-可用
 
@@ -33,20 +23,20 @@ public class ServiceSchedule {
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updatedTime;
 
-    // 获取完整的开始时间（计算属性）
-    public LocalDateTime getStartTime() {
-        return LocalDateTime.of(
-                scheduleDate,
-                LocalTime.of(scheduleHour, scheduleMinute)
-        );
-    }
-
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getDoctorId() {
+        return doctorId;
+    }
+
+    public void setDoctorId(Long doctorId) {
+        this.doctorId = doctorId;
     }
 
     public Long getServiceId() {
@@ -57,28 +47,12 @@ public class ServiceSchedule {
         this.serviceId = serviceId;
     }
 
-    public LocalDate getScheduleDate() {
-        return scheduleDate;
+    public LocalDateTime getStartTime() {
+        return startTime;
     }
 
-    public void setScheduleDate(LocalDate scheduleDate) {
-        this.scheduleDate = scheduleDate;
-    }
-
-    public Integer getScheduleHour() {
-        return scheduleHour;
-    }
-
-    public void setScheduleHour(Integer scheduleHour) {
-        this.scheduleHour = scheduleHour;
-    }
-
-    public Integer getScheduleMinute() {
-        return scheduleMinute;
-    }
-
-    public void setScheduleMinute(Integer scheduleMinute) {
-        this.scheduleMinute = scheduleMinute;
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
     }
 
     public Integer getDuration() {
@@ -112,4 +86,5 @@ public class ServiceSchedule {
     public void setUpdatedTime(LocalDateTime updatedTime) {
         this.updatedTime = updatedTime;
     }
+// 删除 getStartTime() 方法（直接使用 startTime 字段）
 }

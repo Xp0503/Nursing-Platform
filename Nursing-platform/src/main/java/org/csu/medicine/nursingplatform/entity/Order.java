@@ -1,6 +1,5 @@
 package org.csu.medicine.nursingplatform.entity;
 
-
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import java.math.BigDecimal;
@@ -22,6 +21,8 @@ public class Order {
     private Integer status; // 0-待支付 1-待服务 2-服务中 3-已完成 4-已取消
     private Integer payMethod; // 1-微信 2-支付宝
     private LocalDateTime payTime;
+    private Long doctorId;     // 新增字段
+    private Long scheduleId;   // 新增字段
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
@@ -43,6 +44,8 @@ public class Order {
                 ", status=" + status +
                 ", payMethod=" + payMethod +
                 ", payTime=" + payTime +
+                ", doctorId=" + doctorId +
+                ", scheduleId=" + scheduleId +
                 ", createTime=" + createTime +
                 ", updateTime=" + updateTime +
                 '}';
@@ -134,6 +137,22 @@ public class Order {
 
     public void setPayTime(LocalDateTime payTime) {
         this.payTime = payTime;
+    }
+
+    public Long getDoctorId() {
+        return doctorId;
+    }
+
+    public void setDoctorId(Long doctorId) {
+        this.doctorId = doctorId;
+    }
+
+    public Long getScheduleId() {
+        return scheduleId;
+    }
+
+    public void setScheduleId(Long scheduleId) {
+        this.scheduleId = scheduleId;
     }
 
     public LocalDateTime getCreateTime() {

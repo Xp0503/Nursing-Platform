@@ -16,4 +16,9 @@ public interface ComplaintMapper extends BaseMapper<Complaint> {
 
     @Select("SELECT * FROM complaint WHERE order_id = #{orderId} ORDER BY create_time DESC")
     List<Complaint> selectByOrderId(@Param("orderId") Long orderId);
+    @Select("SELECT * FROM complaint WHERE doctor_id = #{doctorId} ORDER BY create_time DESC")
+    List<Complaint> selectByDoctorId(@Param("doctorId") Long doctorId);
+
+    @Select("SELECT * FROM complaint WHERE handler_doctor_id = #{doctorId} ORDER BY create_time DESC")
+    List<Complaint> selectByHandlerDoctorId(@Param("doctorId") Long doctorId);
 }

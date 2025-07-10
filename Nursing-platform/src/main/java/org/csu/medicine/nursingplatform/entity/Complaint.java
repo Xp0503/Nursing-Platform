@@ -21,7 +21,8 @@ public class Complaint {
     private String feedback;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
-
+    private Long doctorId;         // 新增: 被投诉医生ID
+    private Long handlerDoctorId;  // 新增: 处理医生ID
     @Override
     public String toString() {
         return "Complaint{" +
@@ -35,6 +36,8 @@ public class Complaint {
                 ", feedback='" + feedback + '\'' +
                 ", createTime=" + createTime +
                 ", updateTime=" + updateTime +
+                ", doctorId=" + doctorId +          // 新增
+                ", handlerDoctorId=" + handlerDoctorId + // 新增
                 '}';
     }
 
@@ -117,4 +120,21 @@ public class Complaint {
     public void setUpdateTime(LocalDateTime updateTime) {
         this.updateTime = updateTime;
     }
+    public Long getDoctorId() {
+        return doctorId;
+    }
+
+    public void setDoctorId(Long doctorId) {
+        this.doctorId = doctorId;
+    }
+
+    public Long getHandlerDoctorId() {
+        return handlerDoctorId;
+    }
+
+    public void setHandlerDoctorId(Long handlerDoctorId) {
+        this.handlerDoctorId = handlerDoctorId;
+    }
+
+
 }

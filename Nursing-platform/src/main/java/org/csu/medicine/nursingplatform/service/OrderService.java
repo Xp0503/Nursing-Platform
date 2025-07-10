@@ -1,23 +1,17 @@
 package org.csu.medicine.nursingplatform.service;
 
-
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.csu.medicine.nursingplatform.entity.Order;
 import org.csu.medicine.nursingplatform.mapper.OrderMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
-
-@Component
 
 @Service
 public class OrderService {
@@ -37,7 +31,8 @@ public class OrderService {
      */
     @Transactional
     public Order createOrder(Long userId, Long serviceId, Long addressId,
-                             LocalDateTime appointmentTime, BigDecimal amount, String remark) {
+                             LocalDateTime appointmentTime, BigDecimal amount,
+                             String remark, Long scheduleId) {
 
         // 生成唯一订单号
         String orderNo = "ORD" + UUID.randomUUID().toString().replace("-", "").substring(0, 16);
@@ -51,9 +46,13 @@ public class OrderService {
         order.setAmount(amount);
         order.setRemark(remark);
         order.setStatus(0); // 待支付状态
+        order.setScheduleId(scheduleId); // 关联排班ID
         order.setCreateTime(LocalDateTime.now());
         order.setUpdateTime(LocalDateTime.now());
         orderMapper.insert(order);
+
+        // 锁定排班
+        orderMapper.updateScheduleStatus(scheduleId, 0); // 0=已预约
         return order;
     }
 
@@ -76,6 +75,12 @@ public class OrderService {
         order.setPayMethod(payMethod);
         order.setPayTime(LocalDateTime.now());
 
+        // 关联医生
+        if (order.getScheduleId() != null) {
+            Long doctorId = orderMapper.getDoctorBySchedule(order.getScheduleId());
+            order.setDoctorId(doctorId);
+        }
+
         orderMapper.updateById(order);
     }
 
@@ -96,14 +101,15 @@ public class OrderService {
 
         // 更新状态为已取消
         orderMapper.updateOrderStatus(orderId, 4);
+
+        // 释放排班资源
+        if (order.getScheduleId() != null) {
+            orderMapper.updateScheduleStatus(order.getScheduleId(), 1); // 1=可预约
+        }
     }
 
     /**
      * 每分钟执行一次的定时任务
-     * 处理状态变更：
-     * 1. 待支付超过30分钟 → 自动取消
-     * 2. 待服务超过预约时间 → 自动开始服务
-     * 3. 服务中超过1小时 → 自动完成
      */
     @Scheduled(cron = "0 * * * * ?") // 每分钟执行一次
     @Transactional
@@ -120,6 +126,10 @@ public class OrderService {
                     // 超过30分钟未支付，自动取消
                     if (order.getCreateTime().isBefore(now.minusMinutes(30))) {
                         orderMapper.updateOrderStatus(order.getId(), 4);
+                        // 释放排班资源
+                        if (order.getScheduleId() != null) {
+                            orderMapper.updateScheduleStatus(order.getScheduleId(), 1); // 1=可预约
+                        }
                     }
                     break;
 
@@ -132,7 +142,6 @@ public class OrderService {
 
                 case 2: // 服务中
                     // 服务开始超过1小时，自动完成
-                    // 注意：这里用update_time记录服务开始时间
                     if (order.getUpdateTime().isBefore(now.minusHours(1))) {
                         orderMapper.updateOrderStatus(order.getId(), 3);
                     }
